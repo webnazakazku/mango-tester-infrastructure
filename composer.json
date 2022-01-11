@@ -9,7 +9,7 @@
 	"require-dev": {
 		"nette/utils": "^2.5.7 || ~3.0",
 		"nette/reflection": "^2.4",
-		"phpstan/phpstan": "^0.12.81",
+		"phpstan/phpstan": "^1.0",
 		"mockery/mockery": "^1.0",
 		"nette/bootstrap": "~2.4 | ~3.0",
 		"tracy/tracy": "~2.6"

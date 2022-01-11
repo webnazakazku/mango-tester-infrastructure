@@ -64,18 +64,6 @@ class InfrastructureConfigurator
 	}
 
 
-	public function getContainerFactory(): \Closure
-	{
-		return function (): DI\Container {
-			$class = $this->loadContainer();
-			$container = new $class([]);
-			$container->initialize();
-
-			return $container;
-		};
-	}
-
-
 	/**
 	 * Loads system DI container class and returns its name.
 	 */
