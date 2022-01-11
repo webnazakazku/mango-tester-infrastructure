@@ -27,6 +27,7 @@ class MethodArgumentsResolver
 			return Resolver::autowireArguments($method, $args + $fixedArgs, $appContainer);
 		} elseif ($params[2]->name == 'getter') {
 			$getter = function (string $type, bool $single) use ($appContainer) {
+                /** @var class-string $type */
 				return $single
 					? $appContainer->getByType($type)
 					: array_map([$appContainer, 'getService'], $appContainer->findAutowired($type));

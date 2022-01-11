@@ -109,7 +109,8 @@ class MangoTesterExtension extends CompilerExtension
 	private function requireService(string $class): void
 	{
 		$builder = $this->getContainerBuilder();
-		$name = preg_replace('#\W+#', '_', $class);
+		/** @var string $name */
+        $name = preg_replace('#\W+#', '_', $class);
 		$builder->addDefinition($this->prefix($name))
 			->setClass($class)
 			->addTag(self::TAG_REQUIRE);
