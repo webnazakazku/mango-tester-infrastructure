@@ -157,7 +157,7 @@ class MangoTesterExtension extends CompilerExtension
 		}
 		$def = $builder->addDefinition($name);
 		$def->setClass($className);
-		$def->setDynamic(true);
+		$def->setDynamic();
 
 		return $def;
 	}

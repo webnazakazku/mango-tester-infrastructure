@@ -12,6 +12,10 @@ use ReflectionClass;
 class MethodArgumentsResolver
 {
 
+    /**
+     * @param array<mixed> $args
+     * @return array<mixed>
+     */
 	public function resolve(\ReflectionMethod $method, Container $appContainer, array $args)
 	{
 		$fixedArgs = $this->prepareArguments($method, $appContainer);
