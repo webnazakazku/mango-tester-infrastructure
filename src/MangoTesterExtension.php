@@ -1,14 +1,14 @@
 <?php declare(strict_types = 1);
 
-namespace Mangoweb\Tester\Infrastructure;
+namespace Webnazakazku\MangoTester\Infrastructure;
 
-use Mangoweb\Tester\Infrastructure\Bridges\Mockery\MockeryContainerHook;
-use Mangoweb\Tester\Infrastructure\Container\AppContainerFactory;
 use Nette;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Container;
 use Nette\DI\Definitions\ServiceDefinition;
 use Nette\DI\Statement;
+use Webnazakazku\MangoTester\Infrastructure\Bridges\Mockery\MockeryContainerHook;
+use Webnazakazku\MangoTester\Infrastructure\Container\AppContainerFactory;
 
 
 class MangoTesterExtension extends CompilerExtension

@@ -1,10 +1,10 @@
 <?php declare(strict_types = 1);
 
-namespace MangowebTests\Tester\Infrastructure;
+namespace Tests\Tester\Infrastructure;
 
-use Mangoweb\Tester\Infrastructure\Container\IAppConfiguratorFactory;
 use Nette\Configurator;
 use Nette\DI\Container;
+use Webnazakazku\MangoTester\Infrastructure\Container\IAppConfiguratorFactory;
 
 class AppConfiguratorFactory implements IAppConfiguratorFactory
 {

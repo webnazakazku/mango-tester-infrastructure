@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace Mangoweb\Tester\Infrastructure\Container;
+namespace Webnazakazku\MangoTester\Infrastructure\Container;
 
 use Nette\DI\CompilerExtension;
 

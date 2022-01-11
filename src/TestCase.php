@@ -1,14 +1,14 @@
 <?php declare(strict_types = 1);
 
-namespace Mangoweb\Tester\Infrastructure;
+namespace Webnazakazku\MangoTester\Infrastructure;
 
-use Mangoweb\Tester\Infrastructure\Container\AppContainerFactory;
-use Mangoweb\Tester\Infrastructure\Container\AppContainerHookList;
-use Mangoweb\Tester\Infrastructure\Container\IAppContainerHook;
 use Nette\DI\Container;
 use Nette\Utils\Strings;
 use Tester\AssertException;
 use Tester\Dumper;
+use Webnazakazku\MangoTester\Infrastructure\Container\AppContainerFactory;
+use Webnazakazku\MangoTester\Infrastructure\Container\AppContainerHookList;
+use Webnazakazku\MangoTester\Infrastructure\Container\IAppContainerHook;
 
 
 class TestCase

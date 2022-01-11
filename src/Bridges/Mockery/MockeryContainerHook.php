@@ -1,12 +1,12 @@
 <?php declare(strict_types = 1);
 
-namespace Mangoweb\Tester\Infrastructure\Bridges\Mockery;
+namespace Webnazakazku\MangoTester\Infrastructure\Bridges\Mockery;
 
-use Mangoweb\Tester\Infrastructure\Container\AppContainerHook;
-use Mangoweb\Tester\Infrastructure\TestContext;
 use Mockery\MockInterface;
 use Nette\DI\Container;
 use Nette\Utils\Strings;
+use Webnazakazku\MangoTester\Infrastructure\Container\AppContainerHook;
+use Webnazakazku\MangoTester\Infrastructure\TestContext;
 
 class MockeryContainerHook extends AppContainerHook
 {

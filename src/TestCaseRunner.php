@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace Mangoweb\Tester\Infrastructure;
+namespace Webnazakazku\MangoTester\Infrastructure;
 
 use Tester\DataProvider;
 use Tester\Environment;

@@ -1,9 +1,9 @@
 <?php declare(strict_types = 1);
 
-namespace MangowebTests\Tester\Infrastructure;
+namespace Tests\Tester\Infrastructure;
 
-use Mangoweb\Tester\Infrastructure\MangoTesterExtension;
 use Nette\Configurator;
+use Webnazakazku\MangoTester\Infrastructure\MangoTesterExtension;
 
 class Bootstrap
 {
