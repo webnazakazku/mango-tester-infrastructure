@@ -1,5 +1,6 @@
 {
 	"name": "webnazakazku/mango-tester-infrastructure",
+	"type": "library",
 	"license": "MIT",
 	"require": {
 		"php": ">=7.1",
