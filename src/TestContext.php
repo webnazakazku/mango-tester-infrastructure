@@ -2,15 +2,14 @@
 
 namespace Webnazakazku\MangoTester\Infrastructure;
 
-
 class TestContext
 {
+
 	/** @var class-string */
 	private $testCaseClass;
 
 	/** @var string */
 	private $testMethod;
-
 
 	/**
 	 * @param class-string $testCaseClass
@@ -21,7 +20,6 @@ class TestContext
 		$this->testMethod = $testMethod;
 	}
 
-
 	/**
 	 * @return class-string
 	 */
@@ -30,9 +28,9 @@ class TestContext
 		return $this->testCaseClass;
 	}
 
-
 	public function getTestMethod(): string
 	{
 		return $this->testMethod;
 	}
+
 }

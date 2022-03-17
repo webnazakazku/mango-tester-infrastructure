@@ -2,23 +2,25 @@
 
 namespace Webnazakazku\MangoTester\Infrastructure;
 
+use LogicException;
 use Nette\DI\Container;
 use Nette\Utils\Strings;
+use ReflectionMethod;
 use Tester\AssertException;
 use Tester\Dumper;
+use Throwable;
 use Webnazakazku\MangoTester\Infrastructure\Container\AppContainerFactory;
 use Webnazakazku\MangoTester\Infrastructure\Container\AppContainerHookList;
 use Webnazakazku\MangoTester\Infrastructure\Container\IAppContainerHook;
-
 
 class TestCase
 {
 
 	/** @var bool */
-	private $handleErrors = FALSE;
+	private $handleErrors = false;
 
-	/** @var callable|NULL|FALSE */
-	private $prevErrorHandler = FALSE;
+	/** @var callable|FALSE|NULL */
+	private $prevErrorHandler = false;
 
 	/** @var Container */
 	private $testContainer;
@@ -26,13 +28,11 @@ class TestCase
 	/** @var Container */
 	private $applicationContainer;
 
-
 	public static function run(callable $testContainerFactory): void
 	{
-		$runner = new TestCaseRunner(get_called_class(), $testContainerFactory);
+		$runner = new TestCaseRunner(static::class, $testContainerFactory);
 		$runner->run();
 	}
-
 
 	/**
 	 * @param mixed[] $args
@@ -42,13 +42,13 @@ class TestCase
 	{
 		$testContainer = $testContainerFactory();
 		assert($testContainer instanceof Container);
-		$testContainer->addService($testContainer->findByType(TestContext::class)[0], new TestContext(get_called_class(), $method));
+		$testContainer->addService($testContainer->findByType(TestContext::class)[0], new TestContext(static::class, $method));
 
-		$rm = new \ReflectionMethod(get_called_class(), $method);
+		$rm = new ReflectionMethod(static::class, $method);
 		$appContainer = static::createApplicationContainer($testContainer, $rm);
 		$testContainer->setAppContainer($appContainer);
 
-		$testCase = $testContainer->createInstance(get_called_class());
+		$testCase = $testContainer->createInstance(static::class);
 		assert($testCase instanceof self);
 		$testCase->testContainer = $testContainer;
 		$testCase->applicationContainer = $appContainer;
@@ -59,8 +59,7 @@ class TestCase
 		return $result;
 	}
 
-
-	protected static function createApplicationContainer(Container $testContainer, \ReflectionMethod $rm): Container
+	protected static function createApplicationContainer(Container $testContainer, ReflectionMethod $rm): Container
 	{
 		$hooks = [];
 		$hooks[] = static::getContainerHook($testContainer);
@@ -69,14 +68,14 @@ class TestCase
 		foreach ($hookNames[1] as $hookName) {
 			if (class_exists($hookName)) {
 				$hooks[] = $testContainer->createInstance($hookName);
-			} elseif (method_exists(get_called_class(), $hookName)) {
-				$hookRm = new \ReflectionMethod(get_called_class(), $hookName);
+			} elseif (method_exists(static::class, $hookName)) {
+				$hookRm = new ReflectionMethod(static::class, $hookName);
 				assert($hookRm->isStatic());
-				$methodCallback = [get_called_class(), $hookName];
+				$methodCallback = [static::class, $hookName];
 				assert(is_callable($methodCallback));
 				$hooks[] = $testContainer->callMethod($methodCallback);
 			} else {
-				throw new \LogicException("Hook $hookName not found");
+				throw new LogicException(sprintf('Hook %s not found', $hookName));
 			}
 		}
 
@@ -86,15 +85,13 @@ class TestCase
 		return $factory->create($testContainer, new AppContainerHookList(array_filter($hooks)));
 	}
 
-
 	/**
 	 * Override to add test case specific app hook
 	 */
 	protected static function getContainerHook(Container $testContainer): ?IAppContainerHook
 	{
-		return NULL;
+		return null;
 	}
-
 
 	/**
 	 * This method is called before a test is executed.
@@ -102,7 +99,6 @@ class TestCase
 	protected function setUp(): void
 	{
 	}
-
 
 	protected function executeSetupListeners(): void
 	{
@@ -113,14 +109,12 @@ class TestCase
 		}
 	}
 
-
 	/**
 	 * This method is called after a test is executed.
 	 */
 	protected function tearDown(): void
 	{
 	}
-
 
 	protected function executeTearDownListeners(): void
 	{
@@ -131,24 +125,22 @@ class TestCase
 		}
 	}
 
-
 	/**
 	 * @param mixed[] $args
 	 * @return mixed
 	 */
-	protected function execute(\ReflectionMethod $method, array $args)
+	protected function execute(ReflectionMethod $method, array $args)
 	{
-		if ($this->prevErrorHandler === FALSE) {
+		if ($this->prevErrorHandler === false) {
 			$this->prevErrorHandler = set_error_handler(function ($severity) {
 				if ($this->handleErrors && ($severity & error_reporting()) === $severity) {
-					$this->handleErrors = FALSE;
+					$this->handleErrors = false;
 					$this->silentTearDown();
 				}
 
-				return $this->prevErrorHandler ? call_user_func_array($this->prevErrorHandler, func_get_args()) : FALSE;
+				return $this->prevErrorHandler ? call_user_func_array($this->prevErrorHandler, func_get_args()) : false;
 			});
 		}
-
 
 		try {
 			$this->applicationContainer->callInjects($this);
@@ -156,28 +148,29 @@ class TestCase
 			$this->executeSetupListeners();
 			$this->setUp();
 
-			$this->handleErrors = TRUE;
+			$this->handleErrors = true;
 			try {
 				$result = $this->invoke($method, $args);
-			} catch (\Exception $e) {
-				$this->handleErrors = FALSE;
+			} catch (Throwable $e) {
+				$this->handleErrors = false;
 				$this->silentTearDown();
 				throw $e;
 			}
-			$this->handleErrors = FALSE;
+
+			$this->handleErrors = false;
 
 			$this->tearDown();
 			$this->executeTearDownListeners();
 
 			return $result;
 		} catch (AssertException $e) {
-			throw $e->setMessage("$e->origMessage in {$method->getName()}(" . (substr(Dumper::toLine($args), 1, -1)) . ')');
+			//throw $e->setMessage("$e->origMessage in {$method->getName()}(" . (substr(Dumper::toLine($args), 1, -1)) . ')');
+			throw $e->setMessage($e->origMessage . ' in ' . $method->getName() . '(' . (substr(Dumper::toLine($args), 1, -1)) . ')');
 		} finally {
 			restore_error_handler();
-			$this->prevErrorHandler = FALSE;
+			$this->prevErrorHandler = false;
 		}
 	}
-
 
 	private function silentTearDown(): void
 	{
@@ -186,17 +179,17 @@ class TestCase
 		});
 		try {
 			$this->tearDown();
-		} catch (\Exception $e) {
+		} catch (Throwable $e) { // phpcs:ignore
 		}
+
 		restore_error_handler();
 	}
-
 
 	/**
 	 * @param mixed[] $args
 	 * @return mixed
 	 */
-	protected function invoke(\ReflectionMethod $method, array $args)
+	protected function invoke(ReflectionMethod $method, array $args)
 	{
 		if (count($method->getParameters()) > 0) {
 			$resolver = $this->testContainer->getByType(MethodArgumentsResolver::class);

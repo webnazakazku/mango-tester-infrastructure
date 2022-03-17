@@ -4,12 +4,11 @@ namespace Webnazakazku\MangoTester\Infrastructure\Container;
 
 use Nette\DI\CompilerExtension;
 
-
 class CompilerHookExtension extends CompilerExtension
 {
+
 	/** @var callable[] */
 	public $onBeforeCompile = [];
-
 
 	public function beforeCompile()
 	{
@@ -17,4 +16,5 @@ class CompilerHookExtension extends CompilerExtension
 			call_user_func($fn, $this->getContainerBuilder());
 		}
 	}
+
 }

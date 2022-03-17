@@ -6,12 +6,11 @@ use Nette\Configurator;
 use Nette\DI\Container;
 use Nette\DI\ContainerBuilder;
 
-
 class AppContainerHookList implements IAppContainerHook
 {
+
 	/** @var IAppContainerHook[] */
 	private $hooks;
-
 
 	/**
 	 * @param IAppContainerHook[] $hooks
@@ -20,7 +19,6 @@ class AppContainerHookList implements IAppContainerHook
 	{
 		$this->hooks = $hooks;
 	}
-
 
 	public function getHash(): string
 	{
@@ -32,14 +30,12 @@ class AppContainerHookList implements IAppContainerHook
 		)));
 	}
 
-
 	public function onConfigure(Configurator $appConfigurator): void
 	{
 		foreach ($this->hooks as $hook) {
 			$hook->onConfigure($appConfigurator);
 		}
 	}
-
 
 	public function onCompile(ContainerBuilder $appContainerBuilder): void
 	{
@@ -48,11 +44,11 @@ class AppContainerHookList implements IAppContainerHook
 		}
 	}
 
-
 	public function onCreate(Container $appContainer): void
 	{
 		foreach ($this->hooks as $hook) {
 			$hook->onCreate($appContainer);
 		}
 	}
+
 }

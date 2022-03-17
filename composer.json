@@ -8,11 +8,11 @@
 		"nette/tester": "^2.3.1"
 	},
 	"require-dev": {
-		"nette/utils": "^2.5.7 || ~3.0",
-		"nette/reflection": "^2.4",
-		"phpstan/phpstan": "^1.0",
 		"mockery/mockery": "^1.0",
 		"nette/bootstrap": "~2.4 | ~3.0",
+		"nette/utils": "^2.5.7 || ~3.0",
+		"ninjify/qa": "^0.13",
+		"phpstan/phpstan": "^1.0",
 		"tracy/tracy": "~2.6"
 	},
 	"autoload": {

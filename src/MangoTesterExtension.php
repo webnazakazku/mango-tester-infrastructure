@@ -2,6 +2,7 @@
 
 namespace Webnazakazku\MangoTester\Infrastructure;
 
+use Mockery;
 use Nette;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Container;
@@ -10,9 +11,9 @@ use Nette\DI\Statement;
 use Webnazakazku\MangoTester\Infrastructure\Bridges\Mockery\MockeryContainerHook;
 use Webnazakazku\MangoTester\Infrastructure\Container\AppContainerFactory;
 
-
 class MangoTesterExtension extends CompilerExtension
 {
+
 	public const TAG_REQUIRE = 'mango.tester.require';
 	public const TAG_HOOK = 'mango.tester.hook';
 
@@ -24,12 +25,10 @@ class MangoTesterExtension extends CompilerExtension
 		'mockery' => false,
 	];
 
-
 	public function __construct()
 	{
-		$this->defaults['mockery'] = class_exists(\Mockery::class);
+		$this->defaults['mockery'] = class_exists(Mockery::class);
 	}
-
 
 	public function loadConfiguration()
 	{
@@ -59,10 +58,10 @@ class MangoTesterExtension extends CompilerExtension
 		}
 	}
 
-
 	public function beforeCompile()
 	{
 		$builder = $this->getContainerBuilder();
+
 		foreach ($builder->findByTag(self::TAG_REQUIRE) as $service => $attrs) {
 			/** @var ServiceDefinition $def */
 			$def = $builder->getDefinition($service);
@@ -76,7 +75,6 @@ class MangoTesterExtension extends CompilerExtension
 			}
 		}
 	}
-
 
 	/**
 	 * @param class-string[] $hooks
@@ -94,7 +92,6 @@ class MangoTesterExtension extends CompilerExtension
 		}
 	}
 
-
 	/**
 	 * @param string[] $requiredServices
 	 */
@@ -105,17 +102,15 @@ class MangoTesterExtension extends CompilerExtension
 		}
 	}
 
-
 	private function requireService(string $class): void
 	{
 		$builder = $this->getContainerBuilder();
 		/** @var string $name */
-        $name = preg_replace('#\W+#', '_', $class);
+		$name = preg_replace('#\W+#', '_', $class);
 		$builder->addDefinition($this->prefix($name))
 			->setClass($class)
 			->addTag(self::TAG_REQUIRE);
 	}
-
 
 	/**
 	 * @param mixed[] $config
@@ -125,17 +120,17 @@ class MangoTesterExtension extends CompilerExtension
 		if ($config === []) {
 			return;
 		}
+
 		$builder = $this->getContainerBuilder();
 		$def = $builder->addDefinition($this->prefix('appConfiguratorFactory'))
 			->setFactory(DefaultAppConfiguratorFactory::class, [
-				'configFiles' => $config['configs'] ?? []
+				'configFiles' => $config['configs'] ?? [],
 			]);
 
 		if (($config['overrideDefaultExtensions'] ?? false) !== true) {
 			$def->addSetup('disableDefaultExtensionsOverride');
 		}
 	}
-
 
 	public function afterCompile(Nette\PhpGenerator\ClassType $class)
 	{
@@ -144,7 +139,6 @@ class MangoTesterExtension extends CompilerExtension
 			->setBody('$this->addService(?, $container);', [$this->prefix('appContainer')])
 			->addParameter('container');
 	}
-
 
 	/**
 	 * @return Nette\DI\Definitions\ImportedDefinition|Nette\DI\ServiceDefinition
@@ -155,10 +149,12 @@ class MangoTesterExtension extends CompilerExtension
 		if (class_exists(Nette\DI\Definitions\ImportedDefinition::class)) {
 			return $builder->addImportedDefinition($name)->setType($className);
 		}
+
 		$def = $builder->addDefinition($name);
 		$def->setClass($className);
 		$def->setDynamic();
 
 		return $def;
 	}
+
 }

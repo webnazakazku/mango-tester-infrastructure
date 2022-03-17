@@ -2,21 +2,22 @@
 
 namespace Webnazakazku\MangoTester\Infrastructure;
 
+use LogicException;
 use Nette\DI\Container;
 use Nette\DI\Helpers;
 use Nette\DI\Resolver;
 use Nette\Utils\Strings;
 use ReflectionClass;
-
+use ReflectionMethod;
 
 class MethodArgumentsResolver
 {
 
-    /**
-     * @param array<mixed> $args
-     * @return array<mixed>
-     */
-	public function resolve(\ReflectionMethod $method, Container $appContainer, array $args)
+	/**
+	 * @param array<mixed> $args
+	 * @return array<mixed>
+	 */
+	public function resolve(ReflectionMethod $method, Container $appContainer, array $args)
 	{
 		$fixedArgs = $this->prepareArguments($method, $appContainer);
 
@@ -27,11 +28,11 @@ class MethodArgumentsResolver
 		$ref = new ReflectionClass(Resolver::class);
 		$params = $ref->getMethod('autowireArguments')->getParameters();
 
-		if ($params[2]->name == 'resolver') {
+		if ($params[2]->name === 'resolver') {
 			return Resolver::autowireArguments($method, $args + $fixedArgs, $appContainer);
-		} elseif ($params[2]->name == 'getter') {
+		} elseif ($params[2]->name === 'getter') {
 			$getter = function (string $type, bool $single) use ($appContainer) {
-                /** @var class-string $type */
+				/** @var class-string $type */
 				return $single
 					? $appContainer->getByType($type)
 					: array_map([$appContainer, 'getService'], $appContainer->findAutowired($type));
@@ -39,10 +40,9 @@ class MethodArgumentsResolver
 
 			return Resolver::autowireArguments($method, $args + $fixedArgs, $getter);
 		} else {
-			throw new \LogicException();
+			throw new LogicException();
 		}
 	}
-
 
 	/**
 	 * Autowires parametrics arguments by annotation with the following syntax:
@@ -56,7 +56,7 @@ class MethodArgumentsResolver
 	 *
 	 * @return mixed[]
 	 */
-	protected function prepareArguments(\ReflectionMethod $method, Container $appContainer): array
+	protected function prepareArguments(ReflectionMethod $method, Container $appContainer): array
 	{
 		$doc = $method->getDocComment() ?: '';
 
@@ -70,4 +70,5 @@ class MethodArgumentsResolver
 
 		return $args;
 	}
+
 }

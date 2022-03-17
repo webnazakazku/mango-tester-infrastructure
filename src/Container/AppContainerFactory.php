@@ -2,24 +2,22 @@
 
 namespace Webnazakazku\MangoTester\Infrastructure\Container;
 
-use Webnazakazku\MangoTester\Infrastructure\MangoTesterExtension;
 use Nette\Configurator;
 use Nette\DI\Compiler;
 use Nette\DI\Container;
 use Nette\DI\ContainerBuilder;
-
+use Webnazakazku\MangoTester\Infrastructure\MangoTesterExtension;
 
 class AppContainerFactory
 {
+
 	/** @var IAppConfiguratorFactory */
 	private $appConfiguratorFactory;
-
 
 	public function __construct(IAppConfiguratorFactory $appConfiguratorFactory)
 	{
 		$this->appConfiguratorFactory = $appConfiguratorFactory;
 	}
-
 
 	public function create(Container $testContainer, ?IAppContainerHook $testCaseHook): Container
 	{
@@ -33,7 +31,6 @@ class AppContainerFactory
 
 		return $appContainer;
 	}
-
 
 	protected function setupConfigurator(Container $testContainer, Configurator $appConfigurator, IAppContainerHook $hook): void
 	{
@@ -54,7 +51,6 @@ class AppContainerFactory
 		]);
 	}
 
-
 	protected function getHook(Container $testContainer, ?IAppContainerHook $testCaseHook): IAppContainerHook
 	{
 		$hooks = [];
@@ -71,4 +67,5 @@ class AppContainerFactory
 
 		return new AppContainerHookList($hooks);
 	}
+
 }

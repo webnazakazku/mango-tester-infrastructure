@@ -7,9 +7,9 @@ use Nette\DI\Container;
 use Nette\DI\Extensions\ExtensionsExtension;
 use Webnazakazku\MangoTester\Infrastructure\Container\IAppConfiguratorFactory;
 
-
 class DefaultAppConfiguratorFactory implements IAppConfiguratorFactory
 {
+
 	private const COPIED_PARAMETERS = [
 		'logDir',
 		'tempDir',
@@ -27,7 +27,6 @@ class DefaultAppConfiguratorFactory implements IAppConfiguratorFactory
 	/** @var bool */
 	private $defaultExtensionsOverride = true;
 
-
 	/**
 	 * @param string[]          $configFiles
 	 * @param string[] $copiedParameters
@@ -38,18 +37,16 @@ class DefaultAppConfiguratorFactory implements IAppConfiguratorFactory
 		$this->copiedParameters = $copiedParameters;
 	}
 
-
 	public function disableDefaultExtensionsOverride(bool $disable = true): void
 	{
 		$this->defaultExtensionsOverride = !$disable;
 	}
 
-
 	public function create(Container $testContainer): Configurator
 	{
 		$params = $testContainer->getParameters();
 
-		$configurator = new Configurator;
+		$configurator = new Configurator();
 		if ($this->defaultExtensionsOverride) {
 			$configurator->defaultExtensions = [
 				'extensions' => ExtensionsExtension::class,
@@ -68,4 +65,5 @@ class DefaultAppConfiguratorFactory implements IAppConfiguratorFactory
 
 		return $configurator;
 	}
+
 }

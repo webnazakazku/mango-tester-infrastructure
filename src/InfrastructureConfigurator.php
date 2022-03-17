@@ -2,18 +2,20 @@
 
 namespace Webnazakazku\MangoTester\Infrastructure;
 
+use Closure;
 use Nette;
 use Nette\DI;
-
+use Tester\Dumper;
+use Tester\Environment;
 
 class InfrastructureConfigurator
 {
+
 	/** @var mixed[] */
 	protected $parameters;
 
 	/** @var array<string|mixed[]> */
 	protected $configs = [];
-
 
 	public function __construct(string $path)
 	{
@@ -27,20 +29,17 @@ class InfrastructureConfigurator
 		];
 	}
 
-
 	public function setupTester(): void
 	{
-		\Tester\Environment::setup();
-		\Tester\Dumper::$maxPathSegments = 0;
+		Environment::setup();
+		Dumper::$maxPathSegments = 0;
 	}
-
 
 	public function setTimeZone(string $timezone): void
 	{
 		date_default_timezone_set($timezone);
 		@ini_set('date.timezone', $timezone); // @ - function may be disabled
 	}
-
 
 	/**
 	 * @param mixed[] $params
@@ -53,7 +52,6 @@ class InfrastructureConfigurator
 		$this->parameters = $parameters;
 	}
 
-
 	/**
 	 * @param mixed[]|string $config file or configuration itself
 	 */
@@ -63,19 +61,17 @@ class InfrastructureConfigurator
 		$this->configs[] = $config;
 	}
 
+	public function getContainerFactory(): Closure
+	{
+		return function (): DI\Container {
+			$class = $this->loadContainer();
+			/** @var DI\Container $container */
+			$container = new $class([]);
+			$container->initialize();
 
-    public function getContainerFactory(): \Closure
-    {
-        return function (): DI\Container {
-            $class = $this->loadContainer();
-            /** @var DI\Container $container */
-            $container = new $class([]);
-            $container->initialize();
-
-            return $container;
-        };
-    }
-
+			return $container;
+		};
+	}
 
 	/**
 	 * Loads system DI container class and returns its name.
@@ -86,29 +82,29 @@ class InfrastructureConfigurator
 			$this->getCacheDirectory() . '/Mango.Tester.Infrastructure',
 			$this->parameters['debugMode']
 		);
-		$class = $loader->load(
+		return $loader->load(
 			function (DI\Compiler $compiler) {
 				return $this->generateContainer($compiler);
 			},
 			[$this->parameters, $this->configs, PHP_VERSION_ID - PHP_RELEASE_VERSION]
 		);
-		return $class;
 	}
-
 
 	protected function generateContainer(DI\Compiler $compiler): string
 	{
 		$compiler->addConfig(['parameters' => $this->parameters]);
 
-		$loader = new DI\Config\Loader;
+		$loader = new DI\Config\Loader();
 		$fileInfo = [];
 		foreach ($this->configs as $config) {
 			if (is_string($config)) {
-				$fileInfo[] = "// source: $config";
+				$fileInfo[] = sprintf('// source: %s', $config);
 				$config = $loader->load($config);
 			}
+
 			$compiler->addConfig($config);
 		}
+
 		$compiler->addDependencies($loader->getDependencies());
 
 		$compiler->addExtension('extensions', new DI\Extensions\ExtensionsExtension());
@@ -118,11 +114,11 @@ class InfrastructureConfigurator
 		return implode("\n", $fileInfo) . "\n\n" . $classes;
 	}
 
-
 	protected function getCacheDirectory(): string
 	{
 		$dir = $this->parameters['tempDir'] . '/cache';
 		Nette\Utils\FileSystem::createDir($dir);
 		return $dir;
 	}
+
 }

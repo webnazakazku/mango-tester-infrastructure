@@ -7,6 +7,7 @@ use Webnazakazku\MangoTester\Infrastructure\MangoTesterExtension;
 
 class Bootstrap
 {
+
 	public const FACTORY = [self::class, 'createContainer'];
 
 	public static function createContainer()
@@ -21,9 +22,10 @@ class Bootstrap
 			],
 			'services' => [
 				AppConfiguratorFactory::class,
-			]
+			],
 		]);
 
 		return $configurator->createContainer();
 	}
+
 }
