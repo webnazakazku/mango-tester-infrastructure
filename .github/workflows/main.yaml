@@ -23,9 +23,18 @@ jobs:
 
     strategy:
       matrix:
-        php-version: ["7.2", "7.3", "7.4", "8.0", "8.1"]
-        operating-system: ["ubuntu-latest"]
+        php-version: [ "7.2", "7.3", "7.4", "8.0", "8.1" ]
+        operating-system: [ "ubuntu-latest" ]
+        composer-args: [ "" ]
+        include:
+          - php-version: "7.2"
+            operating-system: "ubuntu-latest"
+            composer-args: "--prefer-lowest"
+          - php-version: "8.0"
+            operating-system: "ubuntu-latest"
+            composer-args: ""
       fail-fast: false
+
 
     steps:
       - name: "Checkout"
@@ -76,17 +85,5 @@ jobs:
       - name: "PHPStan"
         run: "vendor/bin/phpstan analyse --configuration phpstan.neon --level 8 src/"
 
-      - name: "Run single test"
-        run: "php tests/cases/TestRunTest.phpt"
-
       - name: "Tester"
-        run: "vendor/bin/tester -C tests/cases"
-
-      - name: "Install lowest dependencies"
-        run: "${{ env.composer-install }} --prefer-lowest"
-
-      - name: "Run single test"
-        run: "php tests/cases/TestRunTest.phpt"
-
-      - name: "Tester on lowest"
         run: "vendor/bin/tester -C tests/cases"
