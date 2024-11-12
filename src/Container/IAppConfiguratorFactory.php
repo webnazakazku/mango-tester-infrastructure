@@ -2,7 +2,7 @@
 
 namespace Webnazakazku\MangoTester\Infrastructure\Container;
 
-use Nette\Configurator;
+use Nette\Bootstrap\Configurator;
 use Nette\DI\Container;
 
 interface IAppConfiguratorFactory

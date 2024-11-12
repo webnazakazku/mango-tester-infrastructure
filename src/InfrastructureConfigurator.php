@@ -3,8 +3,13 @@
 namespace Webnazakazku\MangoTester\Infrastructure;
 
 use Closure;
-use Nette;
-use Nette\DI;
+use Nette\DI\Compiler;
+use Nette\DI\Config\Loader;
+use Nette\DI\Container;
+use Nette\DI\ContainerLoader;
+use Nette\DI\Extensions\ExtensionsExtension;
+use Nette\Schema\Helpers;
+use Nette\Utils\FileSystem;
 use Tester\Dumper;
 use Tester\Environment;
 
@@ -12,10 +17,10 @@ class InfrastructureConfigurator
 {
 
 	/** @var mixed[] */
-	protected $parameters;
+	protected array $parameters;
 
 	/** @var array<string|mixed[]> */
-	protected $configs = [];
+	protected array $configs = [];
 
 	public function __construct(string $path)
 	{
@@ -46,7 +51,7 @@ class InfrastructureConfigurator
 	 */
 	public function addParameters(array $params): void
 	{
-		$parameters = DI\Config\Helpers::merge($params, $this->parameters);
+		$parameters = Helpers::merge($params, $this->parameters);
 		assert(is_array($parameters));
 
 		$this->parameters = $parameters;
@@ -55,7 +60,7 @@ class InfrastructureConfigurator
 	/**
 	 * @param mixed[]|string $config file or configuration itself
 	 */
-	public function addConfig($config): void
+	public function addConfig(array|string $config): void
 	{
 		assert(is_string($config) || is_array($config));
 		$this->configs[] = $config;
@@ -63,9 +68,9 @@ class InfrastructureConfigurator
 
 	public function getContainerFactory(): Closure
 	{
-		return function (): DI\Container {
+		return function (): Container {
 			$class = $this->loadContainer();
-			/** @var DI\Container $container */
+			/** @var Container $container */
 			$container = new $class([]);
 			$container->initialize();
 
@@ -78,23 +83,22 @@ class InfrastructureConfigurator
 	 */
 	protected function loadContainer(): string
 	{
-		$loader = new DI\ContainerLoader(
+		$loader = new ContainerLoader(
 			$this->getCacheDirectory() . '/Mango.Tester.Infrastructure',
 			$this->parameters['debugMode']
 		);
+
 		return $loader->load(
-			function (DI\Compiler $compiler) {
-				return $this->generateContainer($compiler);
-			},
+			fn (Compiler $compiler) => $this->generateContainer($compiler),
 			[$this->parameters, $this->configs, PHP_VERSION_ID - PHP_RELEASE_VERSION]
 		);
 	}
 
-	protected function generateContainer(DI\Compiler $compiler): string
+	protected function generateContainer(Compiler $compiler): string
 	{
 		$compiler->addConfig(['parameters' => $this->parameters]);
 
-		$loader = new DI\Config\Loader();
+		$loader = new Loader();
 		$fileInfo = [];
 		foreach ($this->configs as $config) {
 			if (is_string($config)) {
@@ -107,17 +111,19 @@ class InfrastructureConfigurator
 
 		$compiler->addDependencies($loader->getDependencies());
 
-		$compiler->addExtension('extensions', new DI\Extensions\ExtensionsExtension());
+		$compiler->addExtension('extensions', new ExtensionsExtension());
 		$compiler->addExtension('mango.tester', new MangoTesterExtension());
 
 		$classes = $compiler->compile();
+
 		return implode("\n", $fileInfo) . "\n\n" . $classes;
 	}
 
 	protected function getCacheDirectory(): string
 	{
 		$dir = $this->parameters['tempDir'] . '/cache';
-		Nette\Utils\FileSystem::createDir($dir);
+		FileSystem::createDir($dir);
+
 		return $dir;
 	}
 

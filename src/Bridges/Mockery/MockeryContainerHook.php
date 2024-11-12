@@ -14,8 +14,7 @@ use Webnazakazku\MangoTester\Infrastructure\TestContext;
 class MockeryContainerHook extends AppContainerHook
 {
 
-	/** @var TestContext */
-	private $testContext;
+	private TestContext $testContext;
 
 	public function __construct(TestContext $testContext)
 	{

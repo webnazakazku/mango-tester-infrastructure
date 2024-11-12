@@ -8,9 +8,9 @@ class CompilerHookExtension extends CompilerExtension
 {
 
 	/** @var callable[] */
-	public $onBeforeCompile = [];
+	public array $onBeforeCompile = [];
 
-	public function beforeCompile()
+	public function beforeCompile(): void
 	{
 		foreach ($this->onBeforeCompile as $fn) {
 			call_user_func($fn, $this->getContainerBuilder());

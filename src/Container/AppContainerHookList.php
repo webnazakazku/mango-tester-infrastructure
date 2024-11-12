@@ -2,7 +2,7 @@
 
 namespace Webnazakazku\MangoTester\Infrastructure\Container;
 
-use Nette\Configurator;
+use Nette\Bootstrap\Configurator;
 use Nette\DI\Container;
 use Nette\DI\ContainerBuilder;
 
@@ -10,7 +10,7 @@ class AppContainerHookList implements IAppContainerHook
 {
 
 	/** @var IAppContainerHook[] */
-	private $hooks;
+	private array $hooks;
 
 	/**
 	 * @param IAppContainerHook[] $hooks
@@ -23,9 +23,7 @@ class AppContainerHookList implements IAppContainerHook
 	public function getHash(): string
 	{
 		return md5(serialize(array_map(
-			static function (IAppContainerHook $hook): string {
-				return $hook->getHash();
-			},
+			static fn (IAppContainerHook $hook): string => $hook->getHash(),
 			$this->hooks
 		)));
 	}

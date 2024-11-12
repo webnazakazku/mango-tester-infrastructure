@@ -2,7 +2,7 @@
 
 namespace Webnazakazku\MangoTester\Infrastructure\Container;
 
-use Nette\Configurator;
+use Nette\Bootstrap\Configurator;
 use Nette\DI\Compiler;
 use Nette\DI\Container;
 use Nette\DI\ContainerBuilder;
@@ -11,8 +11,7 @@ use Webnazakazku\MangoTester\Infrastructure\MangoTesterExtension;
 class AppContainerFactory
 {
 
-	/** @var IAppConfiguratorFactory */
-	private $appConfiguratorFactory;
+	private IAppConfiguratorFactory $appConfiguratorFactory;
 
 	public function __construct(IAppConfiguratorFactory $appConfiguratorFactory)
 	{
@@ -45,7 +44,7 @@ class AppContainerFactory
 			$compiler->addExtension('mango.tester.beforeCompile', $compilerExtension);
 		};
 
-		$appConfigurator->addParameters([
+		$appConfigurator->addStaticParameters([
 			'hookHash' => $hook->getHash(),
 			'testContainerParameters' => $testContainer->getParameters(),
 		]);

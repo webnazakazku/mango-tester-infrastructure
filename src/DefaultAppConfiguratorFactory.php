@@ -2,7 +2,7 @@
 
 namespace Webnazakazku\MangoTester\Infrastructure;
 
-use Nette\Configurator;
+use Nette\Bootstrap\Configurator;
 use Nette\DI\Container;
 use Nette\DI\Extensions\ExtensionsExtension;
 use Webnazakazku\MangoTester\Infrastructure\Container\IAppConfiguratorFactory;
@@ -19,13 +19,12 @@ class DefaultAppConfiguratorFactory implements IAppConfiguratorFactory
 	];
 
 	/** @var string[] */
-	private $configFiles;
+	private array $configFiles;
 
 	/** @var string[] */
-	private $copiedParameters;
+	private array $copiedParameters;
 
-	/** @var bool */
-	private $defaultExtensionsOverride = true;
+	private bool $defaultExtensionsOverride = true;
 
 	/**
 	 * @param string[]          $configFiles
@@ -58,7 +57,7 @@ class DefaultAppConfiguratorFactory implements IAppConfiguratorFactory
 
 		$parameters = array_intersect_key($params, array_fill_keys($this->copiedParameters, true));
 
-		$configurator->addParameters($parameters);
+		$configurator->addStaticParameters($parameters);
 		foreach ($this->configFiles as $file) {
 			$configurator->addConfig($file);
 		}

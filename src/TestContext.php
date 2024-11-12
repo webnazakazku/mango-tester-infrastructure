@@ -6,10 +6,9 @@ class TestContext
 {
 
 	/** @var class-string */
-	private $testCaseClass;
+	private string $testCaseClass;
 
-	/** @var string */
-	private $testMethod;
+	private string $testMethod;
 
 	/**
 	 * @param class-string $testCaseClass

@@ -17,7 +17,7 @@ class MethodArgumentsResolver
 	 * @param array<mixed> $args
 	 * @return array<mixed>
 	 */
-	public function resolve(ReflectionMethod $method, Container $appContainer, array $args)
+	public function resolve(ReflectionMethod $method, Container $appContainer, array $args): array
 	{
 		$fixedArgs = $this->prepareArguments($method, $appContainer);
 
@@ -29,6 +29,7 @@ class MethodArgumentsResolver
 		$params = $ref->getMethod('autowireArguments')->getParameters();
 
 		if ($params[2]->name === 'resolver') {
+			/** @phpstan-var mixed $appContainer */
 			return Resolver::autowireArguments($method, $args + $fixedArgs, $appContainer);
 		} elseif ($params[2]->name === 'getter') {
 			$getter = function (string $type, bool $single) use ($appContainer) {

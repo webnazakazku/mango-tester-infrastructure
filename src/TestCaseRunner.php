@@ -20,7 +20,7 @@ class TestCaseRunner
 	private $testContainerFactory;
 
 	/** @var class-string */
-	private $testCaseClass;
+	private string $testCaseClass;
 
 	/**
 	 * @param class-string $testCaseClass
@@ -33,9 +33,7 @@ class TestCaseRunner
 
 	public function run(): void
 	{
-		$methods = preg_grep(self::METHOD_PATTERN, array_map(function (ReflectionMethod $rm) {
-			return $rm->getName();
-		}, (new ReflectionClass($this->testCaseClass))->getMethods()));
+		$methods = preg_grep(self::METHOD_PATTERN, array_map(fn (ReflectionMethod $rm) => $rm->getName(), (new ReflectionClass($this->testCaseClass))->getMethods()));
 		assert($methods !== false);
 		$methods = array_values($methods);
 
@@ -105,9 +103,8 @@ class TestCaseRunner
 
 	/**
 	 * @param mixed[] $args
-	 * @return mixed
 	 */
-	private function callTestMethod(string $method, array $args)
+	private function callTestMethod(string $method, array $args): mixed
 	{
 		return ($this->testCaseClass)::runMethod($this->testContainerFactory, $method, $args);
 	}
@@ -125,6 +122,7 @@ class TestCaseRunner
 		$fileName = $rc->getFileName();
 		assert($fileName !== false);
 		[$file, $query] = DataProvider::parseAnnotation($provider, $fileName);
+
 		return DataProvider::load($file, $query);
 	}
 

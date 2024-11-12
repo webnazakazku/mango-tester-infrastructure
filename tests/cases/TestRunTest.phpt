@@ -14,7 +14,7 @@ require __DIR__ . '/../../vendor/autoload.php';
 class TestRunTest extends TestCase
 {
 
-	public function testEcho(DateTimeImmutable $containerDependency)
+	public function testEcho(DateTimeImmutable $containerDependency): void
 	{
 		Assert::true(true);
 	}

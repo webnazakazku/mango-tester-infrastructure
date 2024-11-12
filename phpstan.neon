@@ -1,23 +1,15 @@
+includes:
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - vendor/phpstan/phpstan-nette/extension.neon
+    - vendor/phpstan/phpstan-nette/rules.neon
+
 parameters:
+    level: 8
+
     treatPhpDocTypesAsCertain: false
     ignoreErrors:
         -
-            message: "#^Call to an undefined method Nette\\\\DI\\\\Container\\:\\:initialize\\(\\)\\.$#"
-            count: 1
-            path: src/InfrastructureConfigurator.php
-
-        -
-            message: "#^Call to an undefined static method Nette\\\\DI\\\\Helpers\\:\\:autowireArguments\\(\\)\\.$#"
-            count: 1
-            path: src/MethodArgumentsResolver.php
-
-        -
             message: "#^Call to function method_exists\\(\\) with 'Nette\\\\\\\\DI\\\\\\\\Helpers' and 'autowireArguments' will always evaluate to false\\.$#"
-            count: 1
-            path: src/MethodArgumentsResolver.php
-
-        -
-            message: "#^Parameter \\#3 \\$getter of static method Nette\\\\DI\\\\Resolver\\:\\:autowireArguments\\(\\) expects callable\\(string, bool\\)\\: array\\<object\\>\\|object\\|null, Nette\\\\DI\\\\Container given\\.$#"
             count: 1
             path: src/MethodArgumentsResolver.php
 

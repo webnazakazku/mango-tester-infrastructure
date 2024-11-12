@@ -2,7 +2,7 @@
 
 namespace Webnazakazku\MangoTester\Infrastructure\Container;
 
-use Nette\Configurator;
+use Nette\Bootstrap\Configurator;
 use Nette\DI\Container;
 use Nette\DI\ContainerBuilder;
 
@@ -10,12 +10,12 @@ class ConfigAppContainerHook implements IAppContainerHook
 {
 
 	/** @var array<mixed>|string */
-	private $config;
+	private array|string $config;
 
 	/**
 	 * @param array<mixed>|string $config
 	 */
-	public function __construct($config)
+	public function __construct(array|string $config)
 	{
 		$this->config = $config;
 	}

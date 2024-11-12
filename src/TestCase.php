@@ -16,17 +16,14 @@ use Webnazakazku\MangoTester\Infrastructure\Container\IAppContainerHook;
 class TestCase
 {
 
-	/** @var bool */
-	private $handleErrors = false;
+	private bool $handleErrors = false;
 
 	/** @var callable|FALSE|NULL */
 	private $prevErrorHandler = false;
 
-	/** @var Container */
-	private $testContainer;
+	private Container $testContainer;
 
-	/** @var Container */
-	private $applicationContainer;
+	private Container $applicationContainer;
 
 	public static function run(callable $testContainerFactory): void
 	{
@@ -36,9 +33,8 @@ class TestCase
 
 	/**
 	 * @param mixed[] $args
-	 * @return mixed
 	 */
-	public static function runMethod(callable $testContainerFactory, string $method, array $args)
+	public static function runMethod(callable $testContainerFactory, string $method, array $args): mixed
 	{
 		$testContainer = $testContainerFactory();
 		assert($testContainer instanceof Container);
@@ -127,9 +123,8 @@ class TestCase
 
 	/**
 	 * @param mixed[] $args
-	 * @return mixed
 	 */
-	protected function execute(ReflectionMethod $method, array $args)
+	protected function execute(ReflectionMethod $method, array $args): mixed
 	{
 		if ($this->prevErrorHandler === false) {
 			$this->prevErrorHandler = set_error_handler(function ($severity) {
@@ -154,6 +149,7 @@ class TestCase
 			} catch (Throwable $e) {
 				$this->handleErrors = false;
 				$this->silentTearDown();
+
 				throw $e;
 			}
 
@@ -174,9 +170,7 @@ class TestCase
 
 	private function silentTearDown(): void
 	{
-		set_error_handler(function (): bool {
-			return true;
-		});
+		set_error_handler(fn (): bool => true);
 		try {
 			$this->tearDown();
 		} catch (Throwable $e) { // phpcs:ignore
@@ -187,9 +181,8 @@ class TestCase
 
 	/**
 	 * @param mixed[] $args
-	 * @return mixed
 	 */
-	protected function invoke(ReflectionMethod $method, array $args)
+	protected function invoke(ReflectionMethod $method, array $args): mixed
 	{
 		if (count($method->getParameters()) > 0) {
 			$resolver = $this->testContainer->getByType(MethodArgumentsResolver::class);
@@ -199,6 +192,7 @@ class TestCase
 
 		$callback = [$this, $method->getName()];
 		assert(is_callable($callback));
+
 		return call_user_func_array($callback, $args);
 	}
 

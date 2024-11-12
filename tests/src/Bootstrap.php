@@ -3,6 +3,7 @@
 namespace Tests\Tester\Infrastructure;
 
 use Nette\Configurator;
+use Nette\DI\Container;
 use Webnazakazku\MangoTester\Infrastructure\MangoTesterExtension;
 
 class Bootstrap
@@ -10,7 +11,7 @@ class Bootstrap
 
 	public const FACTORY = [self::class, 'createContainer'];
 
-	public static function createContainer()
+	public static function createContainer(): Container
 	{
 		$configurator = new Configurator();
 		$configurator->setTempDirectory(__DIR__ . '/../temp');

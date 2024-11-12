@@ -3,40 +3,46 @@
 namespace Webnazakazku\MangoTester\Infrastructure;
 
 use Mockery;
-use Nette;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Container;
+use Nette\DI\Definitions\ImportedDefinition;
 use Nette\DI\Definitions\ServiceDefinition;
-use Nette\DI\Statement;
+use Nette\DI\Definitions\Statement;
+use Nette\PhpGenerator\ClassType;
+use Nette\Schema\Expect;
+use Nette\Schema\Schema;
 use Webnazakazku\MangoTester\Infrastructure\Bridges\Mockery\MockeryContainerHook;
 use Webnazakazku\MangoTester\Infrastructure\Container\AppContainerFactory;
 
+/**
+ * @property mixed $config
+ */
 class MangoTesterExtension extends CompilerExtension
 {
 
 	public const TAG_REQUIRE = 'mango.tester.require';
 	public const TAG_HOOK = 'mango.tester.hook';
 
-	/** @var mixed[]  */
-	public $defaults = [
-		'hooks' => [],
-		'require' => [],
-		'appContainer' => [],
-		'mockery' => false,
-	];
-
-	public function __construct()
+	public function getConfigSchema(): Schema
 	{
-		$this->defaults['mockery'] = class_exists(Mockery::class);
+		return Expect::structure([
+			'hooks' => Expect::array(),
+			'require' => Expect::array(),
+			'appContainer' => Expect::array(),
+			'mockery' => Expect::bool()->castTo('bool'),
+		]);
 	}
 
-	public function loadConfiguration()
+	public function loadConfiguration(): void
 	{
-		$config = $this->validateConfig($this->defaults);
+		/** @var mixed $config */
+		$config = $this->config;
 
-		$this->registerRequiredServices($config['require']);
-		$this->registerHooks($config['hooks']);
-		$this->registerAppConfiguratorFactory($config['appContainer']);
+		$config->mockery = class_exists(Mockery::class);
+
+		$this->registerRequiredServices($config->require);
+		$this->registerHooks($config->hooks);
+		$this->registerAppConfiguratorFactory($config->appContainer);
 
 		$builder = $this->getContainerBuilder();
 
@@ -44,21 +50,21 @@ class MangoTesterExtension extends CompilerExtension
 			->setAutowired(false);
 
 		$builder->addDefinition($this->prefix('containerFactory'))
-			->setClass(AppContainerFactory::class);
+			->setType(AppContainerFactory::class);
 
 		$builder->addDefinition($this->prefix('methodArgumentResolver'))
-			->setClass(MethodArgumentsResolver::class);
+			->setType(MethodArgumentsResolver::class);
 
 		$this->addDynamic($this->prefix('testContext'), TestContext::class);
 
-		if ($config['mockery'] !== false) {
+		if ($config->mockery !== false) {
 			$builder->addDefinition($this->prefix('mockeryContainerHook'))
-				->setClass(MockeryContainerHook::class)
+				->setType(MockeryContainerHook::class)
 				->addTag(self::TAG_HOOK);
 		}
 	}
 
-	public function beforeCompile()
+	public function beforeCompile(): void
 	{
 		$builder = $this->getContainerBuilder();
 
@@ -70,7 +76,7 @@ class MangoTesterExtension extends CompilerExtension
 			} elseif (is_string($attrs)) {
 				$def->setFactory(new Statement([$this->prefix('@appContainer'), 'getByType'], [$attrs]));
 			} else {
-				$type = $def->getClass();
+				$type = $def->getType();
 				$def->setFactory(new Statement([$this->prefix('@appContainer'), 'getByType'], [$type]));
 			}
 		}
@@ -87,7 +93,7 @@ class MangoTesterExtension extends CompilerExtension
 			$name = $i++ . preg_replace('#\W+#', '_', $hookClass);
 
 			$builder->addDefinition($this->prefix($name))
-				->setClass($hookClass)
+				->setType($hookClass)
 				->addTag(self::TAG_HOOK);
 		}
 	}
@@ -108,7 +114,7 @@ class MangoTesterExtension extends CompilerExtension
 		/** @var string $name */
 		$name = preg_replace('#\W+#', '_', $class);
 		$builder->addDefinition($this->prefix($name))
-			->setClass($class)
+			->setType($class)
 			->addTag(self::TAG_REQUIRE);
 	}
 
@@ -132,27 +138,21 @@ class MangoTesterExtension extends CompilerExtension
 		}
 	}
 
-	public function afterCompile(Nette\PhpGenerator\ClassType $class)
+	public function afterCompile(ClassType $class): void
 	{
 		parent::afterCompile($class);
+
 		$class->addMethod('setAppContainer')
 			->setBody('$this->addService(?, $container);', [$this->prefix('appContainer')])
 			->addParameter('container');
 	}
 
-	/**
-	 * @return Nette\DI\Definitions\ImportedDefinition|Nette\DI\ServiceDefinition
-	 */
-	private function addDynamic(string $name, string $className)
+	private function addDynamic(string $name, string $className): ImportedDefinition
 	{
 		$builder = $this->getContainerBuilder();
-		if (class_exists(Nette\DI\Definitions\ImportedDefinition::class)) {
-			return $builder->addImportedDefinition($name)->setType($className);
-		}
 
-		$def = $builder->addDefinition($name);
-		$def->setClass($className);
-		$def->setDynamic();
+		$def = $builder->addImportedDefinition($name);
+		$def->setType($className);
 
 		return $def;
 	}
