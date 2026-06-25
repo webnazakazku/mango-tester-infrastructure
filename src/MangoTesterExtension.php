@@ -99,7 +99,7 @@ class MangoTesterExtension extends CompilerExtension
 	}
 
 	/**
-	 * @param string[] $requiredServices
+	 * @param class-string[] $requiredServices
 	 */
 	protected function registerRequiredServices(array $requiredServices): void
 	{
@@ -108,6 +108,9 @@ class MangoTesterExtension extends CompilerExtension
 		}
 	}
 
+	/**
+	 * @param class-string $class
+	 */
 	private function requireService(string $class): void
 	{
 		$builder = $this->getContainerBuilder();
@@ -147,6 +150,9 @@ class MangoTesterExtension extends CompilerExtension
 			->addParameter('container');
 	}
 
+	/**
+	 * @param class-string $className
+	 */
 	private function addDynamic(string $name, string $className): ImportedDefinition
 	{
 		$builder = $this->getContainerBuilder();

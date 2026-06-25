@@ -36,6 +36,7 @@ class MockeryContainerHook extends AppContainerHook
 			}
 
 			[$requiredType, $mockeryType] = $types;
+			/** @var class-string $requiredType */
 			$requiredType = Reflection::expandClassName($requiredType, $rc);
 			$mockeryType = Reflection::expandClassName($mockeryType, $rc);
 
