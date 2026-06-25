@@ -7,6 +7,7 @@ use ReflectionMethod;
 use Tester\DataProvider;
 use Tester\Environment;
 use Tester\Helpers;
+use Tester\TestCase;
 use Tester\TestCaseException;
 
 class TestCaseRunner
@@ -36,24 +37,28 @@ class TestCaseRunner
 		assert($methods !== false);
 		$methods = array_values($methods);
 
-		if (isset($_SERVER['argv'])) {
-			$tmp = preg_filter('#--method=([\w-]+)$#Ai', '$1', $_SERVER['argv']);
-			if ($tmp !== null && $tmp !== []) {
-				assert(is_array($tmp));
-				$method = reset($tmp);
-				if ($method === self::LIST_METHODS) {
-					Environment::$checkAssertions = false;
-					header('Content-Type: text/plain');
+		$tmp = preg_filter('#--method=([\w-]+)$#Ai', '$1', $_SERVER['argv']);
 
+		if (isset($_SERVER['argv']) && $tmp !== []) {
+			assert(is_array($tmp));
+			$method = reset($tmp);
+			if ($method === self::LIST_METHODS) {
+				Environment::$checkAssertions = false;
+				header('Content-Type: text/plain');
+				// @phpstan-ignore-next-line
+				if (method_exists(TestCase::class, 'sendMethodList')) {
 					echo "\n";
 					echo 'TestCase:' . static::class . "\n";
 					echo 'Method:' . implode("\nMethod:", $methods) . "\n";
-
-					return;
+				} else {
+					// legacy format
+					echo '[' . implode(',', $methods) . ']';
 				}
 
-				$this->runMethod($method);
+				return;
 			}
+
+			$this->runMethod($method);
 		} else {
 			foreach ($methods as $method) {
 				$this->runMethod($method);
