@@ -4,15 +4,4 @@ includes:
     - vendor/phpstan/phpstan-nette/rules.neon
 
 parameters:
-    treatPhpDocTypesAsCertain: false
-    ignoreErrors:
-        -
-            message: "#^Call to function method_exists\\(\\) with 'Nette\\\\\\\\DI\\\\\\\\Helpers' and 'autowireArguments' will always evaluate to false\\.$#"
-            count: 1
-            path: src/MethodArgumentsResolver.php
-
-        -
-            message: "#^Call to an undefined method Nette\\\\DI\\\\Container\\:\\:setAppContainer\\(\\)\\.$#"
-            count: 1
-            path: src/TestCase.php
-
+    ignoreErrors: []

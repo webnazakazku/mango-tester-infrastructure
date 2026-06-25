@@ -62,7 +62,6 @@ class InfrastructureConfigurator
 	 */
 	public function addConfig(array|string $config): void
 	{
-		assert(is_string($config) || is_array($config));
 		$this->configs[] = $config;
 	}
 

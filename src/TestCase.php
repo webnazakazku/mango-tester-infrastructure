@@ -42,6 +42,7 @@ class TestCase
 
 		$rm = new ReflectionMethod(static::class, $method);
 		$appContainer = static::createApplicationContainer($testContainer, $rm);
+		/* @phpstan-ignore method.notFound */
 		$testContainer->setAppContainer($appContainer);
 
 		$testCase = $testContainer->createInstance(static::class);
@@ -76,7 +77,6 @@ class TestCase
 		}
 
 		$factory = $testContainer->getByType(AppContainerFactory::class);
-		assert($factory instanceof AppContainerFactory);
 
 		return $factory->create($testContainer, new AppContainerHookList(array_filter($hooks)));
 	}
@@ -186,7 +186,6 @@ class TestCase
 	{
 		if (count($method->getParameters()) > 0) {
 			$resolver = $this->testContainer->getByType(MethodArgumentsResolver::class);
-			assert($resolver instanceof MethodArgumentsResolver);
 			$args = $resolver->resolve($method, $this->applicationContainer, $args);
 		}
 

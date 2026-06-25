@@ -7,7 +7,6 @@ use ReflectionMethod;
 use Tester\DataProvider;
 use Tester\Environment;
 use Tester\Helpers;
-use Tester\TestCase;
 use Tester\TestCaseException;
 
 class TestCaseRunner
@@ -43,14 +42,10 @@ class TestCaseRunner
 			if ($method === self::LIST_METHODS) {
 				Environment::$checkAssertions = false;
 				header('Content-Type: text/plain');
-				if (method_exists(TestCase::class, 'sendMethodList')) {
-					echo "\n";
-					echo 'TestCase:' . static::class . "\n";
-					echo 'Method:' . implode("\nMethod:", $methods) . "\n";
-				} else {
-					// legacy format
-					echo '[' . implode(',', $methods) . ']';
-				}
+
+				echo "\n";
+				echo 'TestCase:' . static::class . "\n";
+				echo 'Method:' . implode("\nMethod:", $methods) . "\n";
 
 				return;
 			}

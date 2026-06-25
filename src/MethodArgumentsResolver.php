@@ -21,24 +21,19 @@ class MethodArgumentsResolver
 	{
 		$fixedArgs = $this->prepareArguments($method, $appContainer);
 
-		if (method_exists(Helpers::class, 'autowireArguments')) {
-			return Helpers::autowireArguments($method, $args + $fixedArgs, $appContainer);
-		}
-
 		$ref = new ReflectionClass(Resolver::class);
 		$params = $ref->getMethod('autowireArguments')->getParameters();
 
-		if ($params[2]->name === 'resolver') {
-			/** @phpstan-var mixed $appContainer */
-			return Resolver::autowireArguments($method, $args + $fixedArgs, $appContainer);
-		} elseif ($params[2]->name === 'getter') {
-			$getter = function (string $type, bool $single) use ($appContainer) {
-				/** @var class-string $type */
-				return $single
-					? $appContainer->getByType($type)
-					: array_map([$appContainer, 'getService'], $appContainer->findAutowired($type));
-			};
+		$getter = function (string $type, bool $single) use ($appContainer) {
+			/** @var class-string $type */
+			return $single
+				? $appContainer->getByType($type)
+				: array_map([$appContainer, 'getService'], $appContainer->findAutowired($type));
+		};
 
+		if ($params[2]->name === 'resolver') {
+			return Resolver::autowireArguments($method, $args + $fixedArgs, $getter);
+		} elseif ($params[2]->name === 'getter') {
 			return Resolver::autowireArguments($method, $args + $fixedArgs, $getter);
 		} else {
 			throw new LogicException();
