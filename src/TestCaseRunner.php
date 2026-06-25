@@ -36,22 +36,24 @@ class TestCaseRunner
 		assert($methods !== false);
 		$methods = array_values($methods);
 
-		if (isset($_SERVER['argv']) && ($tmp = preg_filter('#--method=([\w-]+)$#Ai', '$1', $_SERVER['argv']))) {
-			assert(is_array($tmp));
-			$method = reset($tmp);
-			if ($method === self::LIST_METHODS) {
-				Environment::$checkAssertions = false;
-				header('Content-Type: text/plain');
+		if (isset($_SERVER['argv'])) {
+			$tmp = preg_filter('#--method=([\w-]+)$#Ai', '$1', $_SERVER['argv']);
+			if ($tmp !== null && $tmp !== []) {
+				assert(is_array($tmp));
+				$method = reset($tmp);
+				if ($method === self::LIST_METHODS) {
+					Environment::$checkAssertions = false;
+					header('Content-Type: text/plain');
 
-				echo "\n";
-				echo 'TestCase:' . static::class . "\n";
-				echo 'Method:' . implode("\nMethod:", $methods) . "\n";
+					echo "\n";
+					echo 'TestCase:' . static::class . "\n";
+					echo 'Method:' . implode("\nMethod:", $methods) . "\n";
 
-				return;
+					return;
+				}
+
+				$this->runMethod($method);
 			}
-
-			$this->runMethod($method);
-
 		} else {
 			foreach ($methods as $method) {
 				$this->runMethod($method);
@@ -63,7 +65,7 @@ class TestCaseRunner
 	{
 		if (!method_exists($this->testCaseClass, $method)) {
 			throw new TestCaseException(sprintf("Method '%s' does not exist.", $method));
-		} elseif (!preg_match(self::METHOD_PATTERN, $method)) {
+		} elseif (preg_match(self::METHOD_PATTERN, $method) === false) {
 			throw new TestCaseException(sprintf("Method '%s' is not a testing method.", $method));
 		}
 
@@ -72,7 +74,8 @@ class TestCaseRunner
 			throw new TestCaseException(sprintf('Method %s is not public. Make it public or rename it.', $method->getName()));
 		}
 
-		$info = Helpers::parseDocComment($method->getDocComment() ?: '') + ['dataprovider' => null];
+		$docComment = $method->getDocComment();
+		$info = Helpers::parseDocComment($docComment !== false ? $docComment : '') + ['dataprovider' => null];
 
 		$data = [];
 		$defaultParams = [];
@@ -87,7 +90,7 @@ class TestCaseRunner
 			}
 		}
 
-		if (!$info['dataprovider']) {
+		if (!isset($info['dataprovider'])) {
 			$data[] = [];
 		}
 

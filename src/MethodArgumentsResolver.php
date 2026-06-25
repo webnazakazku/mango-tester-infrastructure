@@ -54,7 +54,8 @@ class MethodArgumentsResolver
 	 */
 	protected function prepareArguments(ReflectionMethod $method, Container $appContainer): array
 	{
-		$doc = $method->getDocComment() ?: '';
+		$docComment = $method->getDocComment();
+		$doc = $docComment !== false ? $docComment : '';
 
 		$parameters = $appContainer->getParameters();
 		$paramAnnotations = Strings::matchAll($doc, '~@param\s+(?P<name>\$\S+)\s+(?P<value>.*?)\s*$~m');

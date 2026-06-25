@@ -60,7 +60,8 @@ class TestCase
 	{
 		$hooks = [];
 		$hooks[] = static::getContainerHook($testContainer);
-		$doc = $rm->getDocComment() ?: '';
+		$docComment = $rm->getDocComment();
+		$doc = $docComment !== false ? $docComment : '';
 		$hookNames = Strings::matchAll($doc, '~\*\s+@hook\s+([\w_\\\\]+)(?:\s+.*)?$~m', PREG_PATTERN_ORDER);
 		foreach ($hookNames[1] as $hookName) {
 			if (class_exists($hookName)) {
@@ -78,7 +79,9 @@ class TestCase
 
 		$factory = $testContainer->getByType(AppContainerFactory::class);
 
-		return $factory->create($testContainer, new AppContainerHookList(array_filter($hooks)));
+		$filteredHooks = array_filter($hooks, static fn ($hook): bool => $hook !== null);
+
+		return $factory->create($testContainer, new AppContainerHookList($filteredHooks));
 	}
 
 	/**
@@ -133,7 +136,9 @@ class TestCase
 					$this->silentTearDown();
 				}
 
-				return $this->prevErrorHandler ? call_user_func_array($this->prevErrorHandler, func_get_args()) : false;
+				return $this->prevErrorHandler !== false && $this->prevErrorHandler !== null
+					? call_user_func_array($this->prevErrorHandler, func_get_args())
+					: false;
 			});
 		}
 
